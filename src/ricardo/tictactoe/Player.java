@@ -10,6 +10,7 @@ import java.net.Socket;
 public class Player {
 
     private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
 
     public static void main(String[] args) {
 
@@ -17,13 +18,27 @@ public class Player {
         player.start();
     }
 
-    public void start(){
+    public void start() {
+
+
         try {
-            Socket socket = new Socket(InetAddress.getByName("192.168.1.13"), 8000);
+            Socket socket = new Socket(InetAddress.getByName("localhost"), 8000);
             inputStream = new ObjectInputStream(socket.getInputStream());
 
-            String[][] board = (String[][])inputStream.readObject();
+            String[][] board = (String[][]) inputStream.readObject();
             printBoard(board);
+
+            board[1][1] = "X";
+            int count = 0;
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            while (count<5) {
+                outputStream.reset();
+                outputStream.writeObject(board);
+                outputStream.flush();
+                board = (String[][]) inputStream.readObject();
+                printBoard(board);
+                count++;
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,7 +48,7 @@ public class Player {
 
     }
 
-    public void printBoard(String[][] board){
+    public void printBoard(String[][] board) {
 
         System.out.println("-------------");
         for (int i = 0; i < 3; i++) {

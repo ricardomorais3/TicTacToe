@@ -20,24 +20,23 @@ public class Server {
         try {
             serverSocket = new ServerSocket(8000);
 
-            while (true) {
-                Socket socketP1 = serverSocket.accept();
-                System.out.println(socketP1);
-                PlayerHandler p1Handler = new PlayerHandler(socketP1);
+            Socket socketP1 = serverSocket.accept();
+            System.out.println(socketP1);
+            PlayerHandler p1Handler = new PlayerHandler(socketP1);
 
-                Thread thread1 = new Thread(p1Handler);
-                thread1.start();
+            Thread thread1 = new Thread(p1Handler);
+            thread1.start();
 
-                Socket socketP2 = serverSocket.accept();
-                System.out.println(socketP2);
-                PlayerHandler p2Handler = new PlayerHandler(socketP2);
+            Socket socketP2 = serverSocket.accept();
+            System.out.println(socketP2);
+            PlayerHandler p2Handler = new PlayerHandler(socketP2);
 
-                Thread thread2 = new Thread(p2Handler);
-                thread2.start();
+            Thread thread2 = new Thread(p2Handler);
+            thread2.start();
 
-                Game game = new Game(p1Handler, p2Handler);
-                game.start();
-            }
+            Game game = new Game(p1Handler, p2Handler);
+            game.start();
+
 
         } catch (IOException e) {
             e.printStackTrace();
