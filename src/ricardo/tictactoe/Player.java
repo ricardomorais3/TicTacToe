@@ -3,6 +3,8 @@ package ricardo.tictactoe;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 
 /**
  * Created by ricardo on 28-11-2016.
@@ -11,6 +13,9 @@ public class Player {
 
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
+    private boolean firstToPlay;
+    private Scanner scanner;
+    private String symbol;
 
     public static void main(String[] args) {
 
@@ -20,32 +25,72 @@ public class Player {
 
     public void start() {
 
-
         try {
             Socket socket = new Socket(InetAddress.getByName("localhost"), 8000);
             inputStream = new ObjectInputStream(socket.getInputStream());
 
-            String[][] board = (String[][]) inputStream.readObject();
-            printBoard(board);
+            // The Game sends this flag before sending the board
+            firstToPlay = (boolean) inputStream.readObject();
 
-            board[1][1] = "X";
-            int count = 0;
+            if (firstToPlay) {
+                symbol = "X";
+            } else {
+                symbol = "O";
+            }
+
+            scanner = new Scanner(System.in);
+
+            int col;
+            int row;
+
             outputStream = new ObjectOutputStream(socket.getOutputStream());
-            while (count<5) {
+
+            String[][] board;
+
+            int counter = 0;
+
+            while (counter < 5) {
+
+                board = (String[][]) inputStream.readObject();
+                printBoard(board);
+
+                row = scanner.nextInt();
+                col = scanner.nextInt();
+
+                board[row][col] = symbol;
+
+                if(checkVictory(board)){
+                    System.out.println("You WIN!!!");
+                }
+
                 outputStream.reset();
                 outputStream.writeObject(board);
                 outputStream.flush();
-                board = (String[][]) inputStream.readObject();
-                printBoard(board);
-                count++;
+
+                counter++;
             }
 
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
 
+    private boolean checkVictory(String[][] board) {
+        if ((board[0][0].equals(symbol) && board[0][1].equals(symbol) && board[0][2].equals(symbol)) ||
+                (board[1][0].equals(symbol) && board[1][1].equals(symbol) && board[1][2].equals(symbol)) ||
+                (board[2][0].equals(symbol) && board[2][1].equals(symbol) && board[2][2].equals(symbol)) ||
+                (board[0][0].equals(symbol) && board[1][0].equals(symbol) && board[2][0].equals(symbol)) ||
+                (board[0][1].equals(symbol) && board[1][1].equals(symbol) && board[2][1].equals(symbol)) ||
+                (board[0][2].equals(symbol) && board[1][2].equals(symbol) && board[2][2].equals(symbol)) ||
+                (board[0][0].equals(symbol) && board[1][1].equals(symbol) && board[2][2].equals(symbol)) ||
+                (board[0][2].equals(symbol) && board[1][1].equals(symbol) && board[2][0].equals(symbol))){
+            return true;
+        }
+        return false;
     }
 
     public void printBoard(String[][] board) {

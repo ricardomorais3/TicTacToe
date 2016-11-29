@@ -37,7 +37,6 @@ public class Server {
             Game game = new Game(p1Handler, p2Handler);
             game.start();
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }

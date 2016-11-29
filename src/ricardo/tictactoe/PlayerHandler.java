@@ -12,8 +12,12 @@ public class PlayerHandler implements Runnable {
 
     private Socket socket;
     private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
+    private boolean ready;
+
 
     public PlayerHandler(Socket socket) {
+
         this.socket = socket;
         try {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -25,46 +29,39 @@ public class PlayerHandler implements Runnable {
 
     @Override
     public void run() {
-        int count = 0;
         try {
-            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-            while (count < 5) {
-                String[][] board = (String[][]) inputStream.readObject();
-                printBoard(board);
-
-                outputStream.reset();
-                outputStream.writeObject(board);
-                outputStream.flush();
-            }
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            ready = true;
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
-        count++;
     }
 
-    public void sendBoard(String[][] board) {
+    public void sendObject(Object object) {
         try {
             outputStream.reset();
-            outputStream.writeObject(board);
+            outputStream.writeObject(object);
             outputStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void printBoard(String[][] board) {
+    public Object getObject() {
+        try {
+            return inputStream.readObject();
 
-        System.out.println("-------------");
-        for (int i = 0; i < 3; i++) {
-            System.out.print("| ");
-            for (int j = 0; j < 3; j++) {
-                System.out.print(board[i][j] + " | ");
-            }
-            System.out.println();
-            System.out.println("-------------");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
+        return null;
     }
+
+    public boolean isReady() {
+        return ready;
+    }
+
 }
