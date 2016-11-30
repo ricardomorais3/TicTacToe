@@ -13,6 +13,7 @@ public class Player {
 
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
+    private DataInputStream inBool;
     private boolean firstToPlay;
     private Scanner scanner;
     private String symbol;
@@ -28,9 +29,10 @@ public class Player {
         try {
             Socket socket = new Socket(InetAddress.getByName("localhost"), 8000);
             inputStream = new ObjectInputStream(socket.getInputStream());
+            inBool = new DataInputStream(socket.getInputStream());
 
             // The Game sends this flag before sending the board
-            firstToPlay = (boolean) inputStream.readObject();
+            firstToPlay = inBool.readBoolean();
 
             if (firstToPlay) {
                 symbol = "X";

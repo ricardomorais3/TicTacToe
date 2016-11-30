@@ -28,8 +28,8 @@ public class Game {
 
         String[][] board = {{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "}};
 
-        firstPlayer.sendObject(true);
-        secondPlayer.sendObject(false);
+        firstPlayer.sendFlag(true);
+        secondPlayer.sendFlag(false);
 
         int counter = 0;
 

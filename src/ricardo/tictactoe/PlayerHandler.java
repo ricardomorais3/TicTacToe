@@ -1,5 +1,6 @@
 package ricardo.tictactoe;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,6 +14,7 @@ public class PlayerHandler implements Runnable {
     private Socket socket;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
+    private DataOutputStream outBool;
     private boolean ready;
 
 
@@ -21,6 +23,7 @@ public class PlayerHandler implements Runnable {
         this.socket = socket;
         try {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outBool = new DataOutputStream(socket.getOutputStream());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,6 +36,15 @@ public class PlayerHandler implements Runnable {
             inputStream = new ObjectInputStream(socket.getInputStream());
             ready = true;
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendFlag(boolean flag){
+        try {
+            outBool.writeBoolean(flag);
+            outBool.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
